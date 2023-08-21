@@ -59,7 +59,7 @@ export const JobsReducer = (state, action) => {
 
       if (
         action.payload !== undefined &&
-        // action.payload.status !== undefined &&
+        action.payload.status !== undefined &&
         action.payload.status !== state.jobs[action.id].status &&
         state.jobs[action.id].status !== undefined &&
         state.jobs[action.id].status !== "Starting" &&
