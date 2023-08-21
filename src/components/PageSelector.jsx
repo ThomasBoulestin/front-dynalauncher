@@ -73,6 +73,18 @@ export function PageSelector() {
         {selected === "settings" && <PreferencesPage></PreferencesPage>}
         {selected === "licenses" && <QrunQkillPage></QrunQkillPage>}
       </div>
+
+      {(selected === "tables" || selected === "shells") && (
+        <div className="d-flex pt-0" style={{ color: "#838383" }}>
+          <div className="flex-fill text-center">ctrl + click to fill form</div>
+          <div className="flex-fill text-center">
+            shift + click to open file explorer
+          </div>
+          <div className="flex-fill text-center">
+            alt + click to open d3plot in lspp
+          </div>
+        </div>
+      )}
     </div>
   );
 }
