@@ -198,7 +198,7 @@ export function Terminal({ job, ...props }) {
     if (text === undefined) {
       return "";
     }
-    text = text.replace(/<\/?[^>]+(>|$)/g, "");
+    // text = text.replace(/<\/?[^>]+(>|$)/g, "");
 
     state.TerminalColorRules.forEach((element) => {
       try {
@@ -206,7 +206,9 @@ export function Terminal({ job, ...props }) {
           new RegExp("^(?!.*span)" + element.re, "gm"),
           "<span style=' " + element.style + "'>$&</span>"
         );
-      } catch (error) {}
+      } catch (error) {
+        console.log(err);
+      }
     });
 
     return text;
@@ -349,6 +351,7 @@ export function Terminal({ job, ...props }) {
             }}
           >
             {parse(colorText(job.stdout))}
+            {/* {job.stdout} */}
           </pre>
         </Card.Body>
         <Card.Footer className="pe-0 d-flex">

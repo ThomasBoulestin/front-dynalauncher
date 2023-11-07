@@ -109,9 +109,15 @@ export function LauncherForm({ ...props }) {
     const res_lic = await serverAndClient.request("getLicCount");
     let available = res_lic[1] - res_lic[0];
 
-    if (ncpu > available) {
+    if (ncpu > available && !expr.includes(" init")) {
       //   if (confirm("Not enough licenses, add to queue ?")) {
-      if (DYNALAUNCHER.showYesNo("", "Not enough licenses, add to queue ?")) {
+
+      const yn = await DYNALAUNCHER.showYesNo(
+        "",
+        "Not enough licenses, add to queue ?"
+      );
+
+      if (yn.message === 0) {
         const isempty = await serverAndClient.request("isFolderEmpty", {
           input_file: input,
         });
@@ -120,21 +126,27 @@ export function LauncherForm({ ...props }) {
             job_data: jobD,
           });
         } else {
-          const yesno = await DYNALAUNCHER.showYesNo(
-            "",
-            "Folder is not empty, do you want to clean it ?"
-          );
+          if (!expr.toLowerCase().includes("r=")) {
+            const yesno = await DYNALAUNCHER.showYesNo(
+              "",
+              "Folder is not empty, do you want to clean it ?"
+            );
 
-          if (yesno.response === 0) {
-            const tt = await serverAndClient
-              .request("cleanFolder", {
-                input: input,
-              })
-              .then(
-                serverAndClient.request("addToQueue", {
-                  job_data: jobD,
+            if (yesno.response === 0) {
+              const tt = await serverAndClient
+                .request("cleanFolder", {
+                  input: input,
                 })
-              );
+                .then(
+                  serverAndClient.request("addToQueue", {
+                    job_data: jobD,
+                  })
+                );
+            }
+          } else {
+            serverAndClient.request("addToQueue", {
+              job_data: jobD,
+            });
           }
         }
         return;
@@ -143,29 +155,36 @@ export function LauncherForm({ ...props }) {
       }
     }
 
-    const isempty = await serverAndClient.request("isFolderEmpty", {
-      input_file: input,
-    });
-
-    if (isempty) {
-      const job = await serverAndClient.request("startJob", {
-        job_data: jobD,
-        clean_all: true,
+    if (!expr.toLowerCase().includes("r=")) {
+      const isempty = await serverAndClient.request("isFolderEmpty", {
+        input_file: input,
       });
-      console.log(job);
-    } else {
-      const yesno = await DYNALAUNCHER.showYesNo(
-        "",
-        "Folder is not empty, do you want to clean it ?"
-      );
 
-      if (yesno.response === 0) {
-        // Save it!
+      if (isempty) {
         const job = await serverAndClient.request("startJob", {
           job_data: jobD,
           clean_all: true,
         });
+        console.log(job);
+      } else {
+        const yesno = await DYNALAUNCHER.showYesNo(
+          "",
+          "Folder is not empty, do you want to clean it ?"
+        );
+
+        if (yesno.response === 0) {
+          // Save it!
+          const job = await serverAndClient.request("startJob", {
+            job_data: jobD,
+            clean_all: true,
+          });
+        }
       }
+    } else {
+      const job = await serverAndClient.request("startJob", {
+        job_data: jobD,
+        clean_all: false,
+      });
     }
   };
 
