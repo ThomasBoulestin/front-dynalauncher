@@ -117,7 +117,7 @@ export function LauncherForm({ ...props }) {
         "Not enough licenses, add to queue ?"
       );
 
-      if (yn.message === 0) {
+      if (yn.response === 0) {
         const isempty = await serverAndClient.request("isFolderEmpty", {
           input_file: input,
         });
