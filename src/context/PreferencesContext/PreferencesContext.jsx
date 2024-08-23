@@ -7,6 +7,7 @@ export const PreferencesContext = createContext();
 export const PreferencesState = ({ children }) => {
   const initialState = {
     server_address: "",
+    server_port: 5568,
     server_home_dir: "",
     client_home_dir: "",
     night_mode: true,

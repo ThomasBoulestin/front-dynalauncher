@@ -16,6 +16,12 @@ export const PreferencesReducer = (state, action) => {
         server_address: action.value,
       };
 
+    case "set_server_port":
+      return {
+        ...state,
+        server_port: action.value,
+      };
+
     case "set_server_home_dir":
       return {
         ...state,

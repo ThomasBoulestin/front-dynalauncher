@@ -141,3 +141,20 @@ export class DurationTimeStampRenderer {
     return false;
   }
 }
+
+export class BtnRenderer {
+  // init method gets the details of the cell to be renderer
+  init(params) {
+    console.log(params);
+    this.eGui = document.createElement("div");
+    this.eGui.innerHTML = "<button>Launch!</button>";
+  }
+
+  getGui() {
+    return this.eGui;
+  }
+
+  refresh(params) {
+    return false;
+  }
+}

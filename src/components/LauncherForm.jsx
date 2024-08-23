@@ -11,6 +11,7 @@ import { serverAndClient, socket } from "../socket/Socket";
 import { JobsContext } from "../context/JobsContext/JobsContext";
 import { PreferencesContext } from "../context/PreferencesContext/PreferencesContext";
 import { ToastContext } from "../context/ToastContext/ToastContext";
+import { VscDebugDisconnect } from "react-icons/vsc";
 
 export function LauncherForm({ ...props }) {
   const { jobs, formData, dispatch } = useContext(JobsContext);
@@ -24,6 +25,7 @@ export function LauncherForm({ ...props }) {
   const [expr, setExpr] = useState("");
   const [preview, setPreview] = useState("");
   const [licCount, setLicCount] = useState([0, 0, 0]);
+  const [freeDiskSpace, setFreeDiskSpace] = useState(["-", 0, 0]);
 
   useEffect(() => {
     if (expr !== undefined) {
@@ -53,6 +55,14 @@ export function LauncherForm({ ...props }) {
     serverAndClient
       .request("getLicCount")
       .then((result) => setLicCount(result));
+  };
+
+  const getFreeDiskSpace = () => {
+    serverAndClient
+      .request("getFreeSpace", {
+        disk: "C:",
+      })
+      .then((result) => setFreeDiskSpace(result));
   };
 
   const startJob = async () => {
@@ -191,8 +201,17 @@ export function LauncherForm({ ...props }) {
   useEffect(() => {
     const inter = setInterval(() => {
       getLicCount();
-    }, 2000);
+    }, 6000);
+
+    const inter2 = setInterval(() => {
+      getFreeDiskSpace();
+    }, 10000);
+
+    getLicCount();
+    getFreeDiskSpace();
   }, []);
+
+  useEffect(() => {}, []);
 
   return (
     <Card id="launcher-form" className="m-2">
@@ -246,6 +265,16 @@ export function LauncherForm({ ...props }) {
               })}
             </DropdownButton>
           </InputGroup>
+          <Button
+            className="px-1"
+            variant="danger"
+            style={{ marginLeft: "auto" }}
+            onClick={() => {
+              socket.close();
+            }}
+          >
+            <VscDebugDisconnect size="16" className="ps-0" /> Disconnect{" "}
+          </Button>
         </div>
         <div className="d-flex mb-1">
           <InputGroup className="me-2" style={{ maxWidth: "50%" }}>
@@ -328,7 +357,15 @@ export function LauncherForm({ ...props }) {
               })}
             </DropdownButton>
           </InputGroup>
+          <div style={{ marginLeft: "auto" }}>
+            <h3 className="m-0">
+              {freeDiskSpace[0]} {freeDiskSpace[1].toFixed(0)}/
+              {freeDiskSpace[2].toFixed(0)}Go (
+              {(freeDiskSpace[2] - freeDiskSpace[1]).toFixed(0)}Go left)
+            </h3>
+          </div>
         </div>
+
         <div className="d-flex mb-1">
           <InputGroup className="me-2" style={{ maxWidth: "75%" }}>
             <InputGroup.Text style={{ width: "8rem" }}>
@@ -344,9 +381,12 @@ export function LauncherForm({ ...props }) {
           <Button className="me-2" onClick={startJob}>
             Send Job
           </Button>
-          <h3 className="m-0">
-            {licCount[0]} / {licCount[1]} ({licCount[2]})
-          </h3>
+
+          <div style={{ marginLeft: "auto" }}>
+            <h3 className="m-0">
+              {licCount[0]} / {licCount[1]} ({licCount[2]})
+            </h3>
+          </div>
         </div>
       </Card.Body>
     </Card>

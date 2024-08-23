@@ -8,9 +8,9 @@ import {
 } from "json-rpc-2.0";
 
 const URL =
-  process.env.NODE_ENV === "production" ? undefined : "http://localhost:5558";
+  process.env.NODE_ENV === "production" ? undefined : "http://localhost:5568";
 
-export const socket = io("http://localhost:5558", {
+export const socket = io("http://localhost:5568", {
   autoConnect: false,
   transports: ["websocket"],
   // reconnection: false,
@@ -34,7 +34,12 @@ export function Socket() {
   useEffect(() => {
     socket.on("message", (event) => {
       serverAndClient.receiveAndSend(JSON.parse(event));
+      console.log(JSON.parse(event));
     });
+
+    // socket.disconnected = (event) => {
+    //   console.log(event);
+    // };
 
     // On close, make sure to reject all the pending requests to prevent hanging.
     socket.onclose = (event) => {

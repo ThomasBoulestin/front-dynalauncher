@@ -3,6 +3,7 @@ import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { socket } from "../socket/Socket";
 import { PreferencesContext } from "../context/PreferencesContext/PreferencesContext";
 import { motion } from "framer-motion";
+import { CiSettings } from "react-icons/ci";
 
 export function LoginModal() {
   const { dispatch, state } = useContext(PreferencesContext);
@@ -14,16 +15,22 @@ export function LoginModal() {
 
   useEffect(() => {
     socket.on("connect_error", (err) => {
+      console.log("disconnected");
       setErrorMessage("Can not connect to server.");
       socket.disconnect();
       setShow(true);
     });
+
     socket.on("disconnect", (e) => {
-      setShow(true);
-    });
-    socket.on("connect", (e) => {
       setShow(false);
-      setErrorMessage("");
+      setErrorMessage(" ");
+    });
+
+    socket.on("connect", (e) => {
+      console.log("connected");
+
+      setShow(false);
+      setErrorMessage(" ");
     });
     socket.on("connect_failed", (err) => {
       setErrorMessage("Can not connect to server.");
@@ -33,6 +40,7 @@ export function LoginModal() {
     });
 
     socket.io.on("close", (err) => {
+      console.log("disconnected");
       setShow(true);
       //   if (socket.connected) {
       //     DYNALAUNCHER.showNotification(
@@ -45,9 +53,10 @@ export function LoginModal() {
 
   function handleChangeUri() {
     setErrorMessage("");
-    socket.io.uri = state.server_address + ":5558";
-    socket.disconnect();
+    socket.io.uri = state.server_address + ":" + state.server_port;
+    // socket.disconnect();
     try {
+      console.log("connect");
       socket.connect();
     } catch {
       console.log("wrong url");
@@ -85,6 +94,13 @@ export function LoginModal() {
         <Modal.Title id="contained-modal-title-vcenter">
           Connection to server
         </Modal.Title>
+        <Button
+          variant="secondary"
+          className="mt-0 p-1"
+          onClick={() => DYNALAUNCHER.openFile()}
+        >
+          <CiSettings size="22" />
+        </Button>
       </Modal.Header>
       <Modal.Body>
         <InputGroup>
@@ -96,7 +112,16 @@ export function LoginModal() {
             }
             onKeyDown={handleKeyPress}
           />
-          <InputGroup.Text>:5558</InputGroup.Text>
+          <InputGroup.Text>{":"}</InputGroup.Text>
+          <Form.Control
+            type="text"
+            value={state.server_port}
+            onChange={(e) =>
+              dispatch({ type: "set_server_port", value: e.target.value })
+            }
+            onKeyDown={handleKeyPress}
+          />
+
           <Button onClick={handleChangeUri}>Connect</Button>
         </InputGroup>
         <div className="d-flex mt-2">
@@ -142,7 +167,7 @@ export function LoginModal() {
           </div>
         )}
 
-        {errorMessage === "" && (
+        {errorMessage === "" && !socket.active && (
           <div className="mt-4 w-50 mx-auto">
             <motion.div
               animate={{ x: ["0%", "100%", "0%"] }}

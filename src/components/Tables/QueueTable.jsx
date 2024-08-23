@@ -15,6 +15,10 @@ import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
 import { JobsContext } from "../../context/JobsContext/JobsContext";
 import { PreferencesContext } from "../../context/PreferencesContext/PreferencesContext";
 
+import { BtnRenderer } from "./Renderers";
+import CustomBtnComp from "./CustomBtnComp";
+import { Button } from "react-bootstrap";
+
 export function QueueTable() {
   const { jobs, dispatch, qtable } = useContext(JobsContext);
   const { night_mode } = useContext(PreferencesContext);
@@ -24,6 +28,12 @@ export function QueueTable() {
   // Each Column Definition results in one Column.
   const [columnDefs, setColumnDefs] = useState([
     { field: "id", hide: true, editable: true, width: 40 },
+    {
+      field: "actions",
+      width: 60,
+      headerName: "Actions",
+      cellRenderer: CustomBtnComp,
+    },
     {
       field: "position",
       editable: true,
@@ -48,6 +58,15 @@ export function QueueTable() {
 
   // Example of consuming Grid Event
   const cellClickedListener = useCallback((event) => {
+    console.log(event);
+
+    if (event.column.colId == "actions") {
+      console.log("DELETE !!", event.rowIndex);
+      serverAndClient.request("removeFromQueue", {
+        position: event.rowIndex,
+      });
+    }
+
     if (event.event.ctrlKey) {
       dispatch({ type: "set_form_data", payload: event.data });
     }

@@ -383,16 +383,14 @@ export function Terminal({ job, ...props }) {
 
             <Button
               variant="secondary"
-              disabled={!(job.status === "Running")}
+              disabled={job.status !== "Running" || job.status !== "Starting"}
               onClick={() => handleD3kill("sw1")}
             >
               sw1
             </Button>
 
             <DropdownButton
-              disabled={
-                !(job.status === "Running" || job.status === "Starting")
-              }
+              //   disabled={job.status !== "Running" || job.status !== "Starting"}
               variant="secondary"
               title=""
               drop="down"
@@ -444,6 +442,9 @@ export function Terminal({ job, ...props }) {
               </Dropdown.Item>
               <Dropdown.Item onClick={handleKillProcess}>
                 Kill Process
+              </Dropdown.Item>
+              <Dropdown.Item onClick={handleRemove}>
+                Force Remove Shell
               </Dropdown.Item>
             </DropdownButton>
           </InputGroup>
