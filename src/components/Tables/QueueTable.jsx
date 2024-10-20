@@ -58,10 +58,7 @@ export function QueueTable() {
 
   // Example of consuming Grid Event
   const cellClickedListener = useCallback((event) => {
-    console.log(event);
-
     if (event.column.colId == "actions") {
-      console.log("DELETE !!", event.rowIndex);
       serverAndClient.request("removeFromQueue", {
         position: event.rowIndex,
       });
@@ -73,14 +70,12 @@ export function QueueTable() {
   }, []);
 
   const handleCellEdit = useCallback((event) => {
-    console.log(event);
     if (event.column.colId == "position") {
       serverAndClient.request("switchPositionQueue", {
         initial: event.oldValue,
         new: event.newValue,
       });
     } else if (event.column.colId == "ncpu") {
-      console.log("cpu");
       serverAndClient.request("setNcpuQueue", {
         id: event.data.id,
         ncpu: event.newValue,

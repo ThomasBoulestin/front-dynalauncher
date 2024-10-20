@@ -15,7 +15,6 @@ export function LoginModal() {
 
   useEffect(() => {
     socket.on("connect_error", (err) => {
-      console.log("disconnected");
       setErrorMessage("Can not connect to server.");
       socket.disconnect();
       setShow(true);
@@ -27,10 +26,18 @@ export function LoginModal() {
     });
 
     socket.on("connect", (e) => {
-      console.log("connected");
-
       setShow(false);
       setErrorMessage(" ");
+      DYNALAUNCHER.getAppVersion().then(
+        (res) =>
+          (document.title =
+            "Dyna Launcher " +
+            res +
+            " -- " +
+            state.server_address +
+            ":" +
+            state.server_port)
+      );
     });
     socket.on("connect_failed", (err) => {
       setErrorMessage("Can not connect to server.");
@@ -40,7 +47,6 @@ export function LoginModal() {
     });
 
     socket.io.on("close", (err) => {
-      console.log("disconnected");
       setShow(true);
       //   if (socket.connected) {
       //     DYNALAUNCHER.showNotification(

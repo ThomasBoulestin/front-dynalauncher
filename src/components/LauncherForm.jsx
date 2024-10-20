@@ -18,6 +18,10 @@ export function LauncherForm({ ...props }) {
   const { state } = useContext(PreferencesContext);
   const { addToast } = useContext(ToastContext);
 
+  const [multiple_input, setMultiple_input] = useState(false);
+  const [multi_from, setMultiFrom] = useState(0);
+  const [multi_to, setMultiTo] = useState(0);
+
   const [input, setInput] = useState("");
   const [solver, setSolver] = useState("");
   const [ncpu, setNcpu] = useState("");
@@ -65,18 +69,57 @@ export function LauncherForm({ ...props }) {
       .then((result) => setFreeDiskSpace(result));
   };
 
-  const startJob = async () => {
-    let jobD = {
-      input: input,
+  const startMultipleJobs = async () => {
+    if (multiple_input) {
+      if (!input.includes("$-$")) {
+        addToast("warning", "Multiple input", "Missing $-$ in input");
+      } else {
+        var tamp_files =
+          "Following jobs will be sent (forced clean / queue): \n\n";
+        for (let index = multi_from; index <= multi_to; index++) {
+          let a = input;
+          tamp_files += a.replace("$-$", index) + "\n";
+        }
+
+        const yesno = await DYNALAUNCHER.showYesNo("", tamp_files);
+
+        if (yesno.response === 0) {
+          for (let index = multi_from; index <= multi_to; index++) {
+            (function (index) {
+              let a = input;
+              startJob(true, true, a.replace("$-$", index));
+            })(index);
+          }
+        }
+      }
+    }
+    return;
+  };
+
+  const startJob = async (
+    force_clean = false,
+    force_queue = false,
+    force_input = false
+  ) => {
+    const jobD = {
+      input: force_input ? force_input : input,
       solver: solver,
       ncpu: ncpu,
-      command: preview,
+      command: force_input
+        ? expr
+            .replace("$NCPU", ncpu)
+            .replace("$INPUT", force_input)
+            .replace("$SOLVER", solver)
+            .replace("$MEMORY", memory)
+        : preview,
       expr: expr,
       memory: memory,
     };
 
+    console.log(jobD);
+
     const input_exists = await serverAndClient.request("fileExists", {
-      input: input,
+      input: jobD.input,
     });
 
     if (!input_exists) {
@@ -94,7 +137,7 @@ export function LauncherForm({ ...props }) {
     }
 
     const isRunning = await serverAndClient.request("isjobRunning", {
-      input: input,
+      input: jobD.input,
     });
 
     if (isRunning) {
@@ -103,7 +146,7 @@ export function LauncherForm({ ...props }) {
     }
 
     const isInQueue = await serverAndClient.request("isInQueue", {
-      input: input,
+      input: jobD.input,
     });
 
     if (isInQueue) {
@@ -122,14 +165,18 @@ export function LauncherForm({ ...props }) {
     if (ncpu > available && !expr.includes(" init")) {
       //   if (confirm("Not enough licenses, add to queue ?")) {
 
-      const yn = await DYNALAUNCHER.showYesNo(
-        "",
-        "Not enough licenses, add to queue ?"
-      );
+      if (force_queue) {
+        var yn = { response: 0 };
+      } else {
+        var yn = await DYNALAUNCHER.showYesNo(
+          "",
+          "Not enough licenses, add to queue ?"
+        );
+      }
 
       if (yn.response === 0) {
         const isempty = await serverAndClient.request("isFolderEmpty", {
-          input_file: input,
+          input_file: jobD.input,
         });
         if (isempty) {
           const job = await serverAndClient.request("addToQueue", {
@@ -137,15 +184,19 @@ export function LauncherForm({ ...props }) {
           });
         } else {
           if (!expr.toLowerCase().includes("r=")) {
-            const yesno = await DYNALAUNCHER.showYesNo(
-              "",
-              "Folder is not empty, do you want to clean it ?"
-            );
+            if (force_clean) {
+              var yesno = { response: 0 };
+            } else {
+              var yesno = await DYNALAUNCHER.showYesNo(
+                "",
+                "Folder is not empty, do you want to clean it ?"
+              );
+            }
 
             if (yesno.response === 0) {
               const tt = await serverAndClient
                 .request("cleanFolder", {
-                  input: input,
+                  input: jobD.input,
                 })
                 .then(
                   serverAndClient.request("addToQueue", {
@@ -167,7 +218,7 @@ export function LauncherForm({ ...props }) {
 
     if (!expr.toLowerCase().includes("r=")) {
       const isempty = await serverAndClient.request("isFolderEmpty", {
-        input_file: input,
+        input_file: jobD.input,
       });
 
       if (isempty) {
@@ -175,12 +226,16 @@ export function LauncherForm({ ...props }) {
           job_data: jobD,
           clean_all: true,
         });
-        console.log(job);
+        // console.log(job);
       } else {
-        const yesno = await DYNALAUNCHER.showYesNo(
-          "",
-          "Folder is not empty, do you want to clean it ?"
-        );
+        if (force_clean) {
+          var yesno = { response: 0 };
+        } else {
+          var yesno = await DYNALAUNCHER.showYesNo(
+            "",
+            "Folder is not empty, do you want to clean it ?"
+          );
+        }
 
         if (yesno.response === 0) {
           // Save it!
@@ -218,31 +273,78 @@ export function LauncherForm({ ...props }) {
       <Card.Body className="p-1">
         <div className="d-flex mb-1">
           <InputGroup className="me-2" style={{ maxWidth: "50%" }}>
-            <InputGroup.Text style={{ width: "8rem" }}>Input:</InputGroup.Text>
-            <Form.Control
-              spellCheck={false}
-              type="text"
-              value={input}
-              onInput={(e) => setInput(e.target.value)}
-            />
-
-            <Button
-              variant="outline-secondary"
-              onClick={() =>
-                DYNALAUNCHER.openDialog().then((result) => {
-                  if (!result.canceled) {
-                    setInput(
-                      result.filePaths[0].replace(
-                        state.client_home_dir,
-                        state.server_home_dir
-                      )
-                    );
+            {!multiple_input && (
+              <>
+                <InputGroup.Text style={{ width: "9rem" }}>
+                  <Form.Check // prettier-ignore
+                    type="switch"
+                    label="Single Input"
+                    onClick={(e) => setMultiple_input(!multiple_input)}
+                  />
+                </InputGroup.Text>
+                <Form.Control
+                  spellCheck={false}
+                  type="text"
+                  value={input}
+                  onInput={(e) => setInput(e.target.value)}
+                />
+                <Button
+                  variant="outline-secondary"
+                  onClick={() =>
+                    DYNALAUNCHER.openDialog().then((result) => {
+                      if (!result.canceled) {
+                        setInput(
+                          result.filePaths[0].replace(
+                            state.client_home_dir,
+                            state.server_home_dir
+                          )
+                        );
+                      }
+                    })
                   }
-                })
-              }
-            >
-              ...
-            </Button>
+                >
+                  ...
+                </Button>
+              </>
+            )}
+            {multiple_input && (
+              <>
+                <InputGroup.Text style={{ width: "9rem" }}>
+                  <Form.Check // prettier-ignore
+                    type="switch"
+                    checked={multiple_input}
+                    label="Multi Input"
+                    onClick={(e) => setMultiple_input(!multiple_input)}
+                  />
+                </InputGroup.Text>
+                {!input.includes("$-$") && (
+                  <InputGroup.Text>
+                    /!\ Missing $-$ replacement tag
+                  </InputGroup.Text>
+                )}
+
+                <Form.Control
+                  spellCheck={false}
+                  type="text"
+                  value={input}
+                  onInput={(e) => setInput(e.target.value)}
+                />
+                <Form.Control
+                  spellCheck={false}
+                  type="number"
+                  value={multi_from}
+                  style={{ maxWidth: "5rem" }}
+                  onInput={(e) => setMultiFrom(e.target.value)}
+                />
+                <Form.Control
+                  spellCheck={false}
+                  type="number"
+                  value={multi_to}
+                  style={{ maxWidth: "5rem" }}
+                  onInput={(e) => setMultiTo(e.target.value)}
+                />
+              </>
+            )}
           </InputGroup>
           <InputGroup style={{ width: "15rem" }}>
             <InputGroup.Text style={{ width: "5rem" }}>ncpu:</InputGroup.Text>
@@ -270,7 +372,7 @@ export function LauncherForm({ ...props }) {
             variant="danger"
             style={{ marginLeft: "auto" }}
             onClick={() => {
-              socket.close();
+              window.location.reload();
             }}
           >
             <VscDebugDisconnect size="16" className="ps-0" /> Disconnect{" "}
@@ -278,7 +380,7 @@ export function LauncherForm({ ...props }) {
         </div>
         <div className="d-flex mb-1">
           <InputGroup className="me-2" style={{ maxWidth: "50%" }}>
-            <InputGroup.Text style={{ width: "8rem" }}>Solver:</InputGroup.Text>
+            <InputGroup.Text style={{ width: "9rem" }}>Solver:</InputGroup.Text>
             <Form.Control
               spellCheck={false}
               type="text"
@@ -337,7 +439,7 @@ export function LauncherForm({ ...props }) {
         </div>
         <div className="d-flex mb-1">
           <InputGroup className="me-2" style={{ maxWidth: "50%" }}>
-            <InputGroup.Text style={{ width: "8rem" }}>Expr:</InputGroup.Text>
+            <InputGroup.Text style={{ width: "9rem" }}>Expr:</InputGroup.Text>
             <Form.Control
               spellCheck={false}
               type="text"
@@ -359,16 +461,15 @@ export function LauncherForm({ ...props }) {
           </InputGroup>
           <div style={{ marginLeft: "auto" }}>
             <h3 className="m-0">
-              {freeDiskSpace[0]} {freeDiskSpace[1].toFixed(0)}/
-              {freeDiskSpace[2].toFixed(0)}Go (
-              {(freeDiskSpace[2] - freeDiskSpace[1]).toFixed(0)}Go left)
+              {freeDiskSpace[0]} ({freeDiskSpace[1].toFixed(0)}/
+              {freeDiskSpace[2].toFixed(0)} Go)
             </h3>
           </div>
         </div>
 
         <div className="d-flex mb-1">
           <InputGroup className="me-2" style={{ maxWidth: "75%" }}>
-            <InputGroup.Text style={{ width: "8rem" }}>
+            <InputGroup.Text style={{ width: "9rem" }}>
               Preview:
             </InputGroup.Text>
             <Form.Control
@@ -378,7 +479,16 @@ export function LauncherForm({ ...props }) {
               onInput={(e) => setPreview(e.target.value)}
             />
           </InputGroup>
-          <Button className="me-2" onClick={startJob}>
+          <Button
+            className="me-2"
+            onClick={(e) => {
+              if (multiple_input) {
+                startMultipleJobs();
+              } else {
+                startJob();
+              }
+            }}
+          >
             Send Job
           </Button>
 

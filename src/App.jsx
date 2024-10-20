@@ -27,6 +27,10 @@ function App() {
     serverAndClient
       .request("getRunningShells")
       .then((result) => dispatch({ type: "set_jobs", jobs: result }));
+
+    DYNALAUNCHER.getAppVersion().then(
+      (res) => (document.title = "Dyna Launcher " + res)
+    );
   }, []);
 
   return (

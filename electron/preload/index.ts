@@ -1,4 +1,4 @@
-const { ipcRenderer, contextBridge } = require("electron");
+const { ipcRenderer, contextBridge, app } = require("electron");
 
 contextBridge.exposeInMainWorld("DYNALAUNCHER", {
   openDialog: async () => {
@@ -33,6 +33,8 @@ contextBridge.exposeInMainWorld("DYNALAUNCHER", {
     const result = await ipcRenderer.invoke("showNotification", title, body);
     return result;
   },
+
+  getAppVersion: (input: String) => ipcRenderer.invoke("getAppVersion"),
   getUserPref: (input: String) => ipcRenderer.invoke("getUserPref"),
   storeUserPref: async (input: String) =>
     ipcRenderer.invoke("storeUserPref", input),

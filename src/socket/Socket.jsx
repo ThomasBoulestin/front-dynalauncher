@@ -34,12 +34,7 @@ export function Socket() {
   useEffect(() => {
     socket.on("message", (event) => {
       serverAndClient.receiveAndSend(JSON.parse(event));
-      console.log(JSON.parse(event));
     });
-
-    // socket.disconnected = (event) => {
-    //   console.log(event);
-    // };
 
     // On close, make sure to reject all the pending requests to prevent hanging.
     socket.onclose = (event) => {
@@ -49,12 +44,10 @@ export function Socket() {
     };
 
     serverAndClient.addMethod("update_data", ({ id, payload }) => {
-      //   console.log(payload);
       dispatch({ type: "update_job", id: id, payload: payload });
     });
 
     serverAndClient.addMethod("appendToShell", ({ id, payload }) => {
-      //   console.log(payload);
       dispatch({ type: "append_stdout", id: id, payload: payload });
     });
 
@@ -67,7 +60,7 @@ export function Socket() {
     });
 
     serverAndClient.addMethod("setQueue", ({ jobs }) => {
-      console.log(jobs);
+      //   console.log(jobs);
       dispatch({ type: "set_queue", jobs: jobs });
     });
   }, []);

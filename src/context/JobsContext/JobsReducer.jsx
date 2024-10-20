@@ -57,22 +57,22 @@ export const JobsReducer = (state, action) => {
         })
         .indexOf(action.id);
 
-      if (
-        action.payload !== undefined &&
-        action.payload.status !== undefined &&
-        action.payload.status !== state.jobs[action.id].status &&
-        state.jobs[action.id].status !== undefined &&
-        state.jobs[action.id].status !== "Starting" &&
-        state.jobs[action.id].status !== "Running"
-      ) {
-        DYNALAUNCHER.showNotification(
-          "Job " +
-            state.jobs[action.id].id +
-            " - " +
-            state.jobs[action.id].status,
-          state.jobs[action.id].input
-        );
-      }
+      //   if (
+      //     action.payload !== undefined &&
+      //     action.payload.status !== undefined &&
+      //     action.payload.status !== state.jobs[action.id].status &&
+      //     state.jobs[action.id].status !== undefined &&
+      //     state.jobs[action.id].status !== "Starting" &&
+      //     state.jobs[action.id].status !== "Running"
+      //   ) {
+      //     DYNALAUNCHER.showNotification(
+      //       "Job " +
+      //         state.jobs[action.id].id +
+      //         " - " +
+      //         state.jobs[action.id].status,
+      //       state.jobs[action.id].input
+      //     );
+      //   }
 
       for (const key in action.payload) {
         if (state.jobs[action.id] !== undefined) {

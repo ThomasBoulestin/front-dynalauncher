@@ -350,8 +350,8 @@ export function Terminal({ job, ...props }) {
               backgroundColor: state.TerminalBgColor,
             }}
           >
-            {parse(colorText(job.stdout))}
-            {/* {job.stdout} */}
+            {/* {parse(colorText(job.stdout))} */}
+            {job.stdout}
           </pre>
         </Card.Body>
         <Card.Footer className="pe-0 d-flex">
@@ -383,7 +383,9 @@ export function Terminal({ job, ...props }) {
 
             <Button
               variant="secondary"
-              disabled={job.status !== "Running" || job.status !== "Starting"}
+              disabled={
+                !(job.status === "Running" || job.status === "Starting")
+              }
               onClick={() => handleD3kill("sw1")}
             >
               sw1

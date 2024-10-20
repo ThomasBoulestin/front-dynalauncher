@@ -226,6 +226,8 @@ ipcMain.handle("showNotification", async (event, ...args) => {
   return result;
 });
 
+ipcMain.handle("getAppVersion", (event, ...args) => app.getVersion());
+
 ipcMain.handle("getUserPref", (event, ...args) => store.get("user_pref"));
 ipcMain.handle("storeUserPref", async (event, ...args) =>
   store.set("user_pref", args[0])
