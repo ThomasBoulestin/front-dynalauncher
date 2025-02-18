@@ -30,14 +30,17 @@ export function LoginModal() {
       setErrorMessage(" ");
       DYNALAUNCHER.getAppVersion().then(
         (res) =>
-          (document.title =
+          (document.getElementsByClassName("cet-title")[0].innerHTML =
             "Dyna Launcher " +
             res +
             " -- " +
-            state.server_address +
+            state[0].server_address +
             ":" +
-            state.server_port)
+            state[0].server_port)
       );
+
+      document.getElementsByClassName("cet-titlebar")[0].style.backgroundColor =
+        "#8584f0";
     });
     socket.on("connect_failed", (err) => {
       setErrorMessage("Can not connect to server.");
@@ -59,7 +62,7 @@ export function LoginModal() {
 
   function handleChangeUri() {
     setErrorMessage("");
-    socket.io.uri = state.server_address + ":" + state.server_port;
+    socket.io.uri = state[0].server_address + ":" + state[0].server_port;
     // socket.disconnect();
     try {
       console.log("connect");
@@ -88,11 +91,11 @@ export function LoginModal() {
   }
 
   useEffect(() => {
-    if (isLocalhost(state.server_address)) {
+    if (isLocalhost(state[0].server_address)) {
       dispatch({ type: "set_server_home_dir", value: "" });
       dispatch({ type: "set_client_home_dir", value: "" });
     }
-  }, [state.server_address]);
+  }, [state[0].server_address]);
 
   return (
     <Modal aria-labelledby="contained-modal-title-vcenter" centered show={show}>
@@ -112,7 +115,7 @@ export function LoginModal() {
         <InputGroup>
           <Form.Control
             type="text"
-            value={state.server_address}
+            value={state[0].server_address}
             onChange={(e) =>
               dispatch({ type: "set_server_address", value: e.target.value })
             }
@@ -121,7 +124,7 @@ export function LoginModal() {
           <InputGroup.Text>{":"}</InputGroup.Text>
           <Form.Control
             type="text"
-            value={state.server_port}
+            value={state[0].server_port}
             onChange={(e) =>
               dispatch({ type: "set_server_port", value: e.target.value })
             }
@@ -137,9 +140,9 @@ export function LoginModal() {
             Server home dir :
           </div>
           <Form.Control
-            disabled={isLocalhost(state.server_address)}
+            disabled={isLocalhost(state[0].server_address)}
             type="text"
-            value={state.server_home_dir}
+            value={state[0].server_home_dir}
             onChange={(e) =>
               dispatch({ type: "set_server_home_dir", value: e.target.value })
             }
@@ -154,9 +157,9 @@ export function LoginModal() {
             Client home dir :
           </div>
           <Form.Control
-            disabled={isLocalhost(state.server_address)}
+            disabled={isLocalhost(state[0].server_address)}
             type="text"
-            value={state.client_home_dir}
+            value={state[0].client_home_dir}
             onChange={(e) =>
               dispatch({ type: "set_client_home_dir", value: e.target.value })
             }

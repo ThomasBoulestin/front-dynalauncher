@@ -8,10 +8,12 @@ export function PrefControl({ name, single, action, v, ...props }) {
 
   useEffect(() => {
     if (single) {
-      setProperties([state[name]]);
+      setProperties([state[0][name]]);
     } else {
-      setProperties(state[name]);
+      setProperties(state[0][name]);
     }
+
+    console.log(properties);
   }, []);
 
   useEffect(() => {

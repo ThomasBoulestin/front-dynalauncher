@@ -1,6 +1,6 @@
 {
-    "name": "front-dynalaucher",
-    "version": "1.0.7",
+    "name": "front-dynalaucher-dev",
+    "version": "1.0.8",
     "main": "dist-electron/main/index.js",
     "description": "",
     "author": "",
@@ -23,6 +23,7 @@
         "ag-grid-community": "^30.0.6",
         "ag-grid-react": "^30.0.6",
         "bootstrap": "^5.3.3",
+        "custom-electron-titlebar": "^4.2.8",
         "electron-store": "^8.1.0",
         "electron-updater": "^5.3.0",
         "framer-motion": "^10.16.0",

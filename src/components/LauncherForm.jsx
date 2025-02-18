@@ -295,8 +295,8 @@ export function LauncherForm({ ...props }) {
                       if (!result.canceled) {
                         setInput(
                           result.filePaths[0].replace(
-                            state.client_home_dir,
-                            state.server_home_dir
+                            state[0].client_home_dir,
+                            state[0].server_home_dir
                           )
                         );
                       }
@@ -355,7 +355,7 @@ export function LauncherForm({ ...props }) {
               onInput={(e) => setNcpu(e.target.value)}
             />
             <DropdownButton variant="outline-secondary" title="">
-              {state.Ncpu.map((e, i) => {
+              {state[0].Ncpu.map((e, i) => {
                 return (
                   <Dropdown.Item
                     key={i}
@@ -393,8 +393,8 @@ export function LauncherForm({ ...props }) {
                 DYNALAUNCHER.openDialog().then((result) => {
                   if (!result.canceled) {
                     setSolver(result.filePaths[0]).replace(
-                      state.client_home_dir,
-                      state.server_home_dir
+                      state[0].client_home_dir,
+                      state[0].server_home_dir
                     );
                   }
                 })
@@ -403,7 +403,7 @@ export function LauncherForm({ ...props }) {
               ...
             </Button>
             <DropdownButton variant="outline-secondary" title="">
-              {state.Solvers.map((e, i) => {
+              {state[0].Solvers.map((e, i) => {
                 return (
                   <Dropdown.Item
                     key={i}
@@ -424,7 +424,7 @@ export function LauncherForm({ ...props }) {
               onInput={(e) => setMemory(e.target.value)}
             />
             <DropdownButton variant="outline-secondary" title="">
-              {state.Memory.map((e, i) => {
+              {state[0].Memory.map((e, i) => {
                 return (
                   <Dropdown.Item
                     key={i}
@@ -447,7 +447,7 @@ export function LauncherForm({ ...props }) {
               onInput={(e) => setExpr(e.target.value)}
             />
             <DropdownButton variant="outline-secondary" title="">
-              {state.Expressions.map((e, i) => {
+              {state[0].Expressions.map((e, i) => {
                 return (
                   <Dropdown.Item
                     key={i}

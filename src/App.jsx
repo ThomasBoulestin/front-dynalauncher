@@ -28,16 +28,27 @@ function App() {
       .request("getRunningShells")
       .then((result) => dispatch({ type: "set_jobs", jobs: result }));
 
-    DYNALAUNCHER.getAppVersion().then(
-      (res) => (document.title = "Dyna Launcher " + res)
-    );
+    DYNALAUNCHER.getAppVersion().then((res) => {
+      // document.title = "Dyna Launcher " + res
+
+      document.getElementsByClassName("cet-icon")[0].childNodes[0].style.width =
+        "20px";
+
+      document.getElementsByClassName("cet-menubar")[0].remove();
+
+      document.getElementsByClassName("cet-title")[0].innerHTML =
+        "Dyna Launcher " + res;
+    });
   }, []);
 
   return (
     <div className="App">
       <Socket></Socket>
       <LoginModal />
-      <div className="d-flex flex-column" style={{ height: "100vh" }}>
+      <div
+        className="d-flex flex-column"
+        style={{ height: "calc(100vh - 30px)" }}
+      >
         <LauncherForm />
         <PageSelector></PageSelector>
       </div>

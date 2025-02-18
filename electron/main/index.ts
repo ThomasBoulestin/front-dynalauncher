@@ -4,6 +4,7 @@ import {
   shell,
   dialog,
   ipcMain,
+  ipcRenderer,
   utilityProcess,
   Notification,
   globalShortcut,
@@ -11,6 +12,12 @@ import {
 import { release } from "node:os";
 import { join } from "node:path";
 import { update } from "./update";
+
+import {
+  setupTitlebar,
+  attachTitlebarToWindow,
+} from "custom-electron-titlebar/main";
+
 const util = require("node:util");
 const exec = util.promisify(require("node:child_process").exec);
 
@@ -49,11 +56,14 @@ if (!app.requestSingleInstanceLock()) {
 // Read more on https://www.electronjs.org/docs/latest/tutorial/security
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
-let win: BrowserWindow;
+export var win: BrowserWindow;
 // Here, you can also use other preload
 const preload = join(__dirname, "../preload/index.js");
 const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
+
+// setup the titlebar main process
+setupTitlebar();
 
 async function createWindow() {
   win = new BrowserWindow({
@@ -61,16 +71,18 @@ async function createWindow() {
     icon: join(process.env.VITE_PUBLIC, "favicon.ico"),
     alwaysOnTop: false,
     autoHideMenuBar: true,
-    frame: true,
+    titleBarStyle: "hidden",
+    titleBarOverlay: false,
+    frame: false,
     show: true,
     width: 1550,
-    height: 775,
+    height: 1005,
     webPreferences: {
-      preload,
+      preload: preload,
       devTools: true,
       //   nodeIntegration: true,
       contextIsolation: true,
-      //   sandbox: false,
+      sandbox: false,
     },
   });
 
@@ -106,6 +118,8 @@ async function createWindow() {
   });
 
   win.removeMenu();
+
+  attachTitlebarToWindow(win);
 
   // Apply electron-updater
   update(win);
@@ -206,6 +220,7 @@ ipcMain.handle("openFile", async (event, ...args) => {
     return result;
   }
 });
+
 ipcMain.handle("openPath", async (event, ...args) => {
   const result = await shell.openPath(args[0]);
   return result;
@@ -229,6 +244,7 @@ ipcMain.handle("showNotification", async (event, ...args) => {
 ipcMain.handle("getAppVersion", (event, ...args) => app.getVersion());
 
 ipcMain.handle("getUserPref", (event, ...args) => store.get("user_pref"));
+
 ipcMain.handle("storeUserPref", async (event, ...args) =>
   store.set("user_pref", args[0])
 );

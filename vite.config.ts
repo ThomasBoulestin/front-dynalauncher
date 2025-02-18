@@ -38,7 +38,8 @@ export default defineConfig(({ command }) => {
           vite: {
             build: {
               sourcemap,
-              minify: isBuild,
+              //   minify: isBuild,
+              minify: false,
               outDir: "dist-electron/main",
               rollupOptions: {
                 external: Object.keys(
@@ -58,7 +59,8 @@ export default defineConfig(({ command }) => {
           vite: {
             build: {
               sourcemap: sourcemap ? "inline" : undefined, // #332
-              minify: isBuild,
+              //   minify: isBuild,
+              minify: false,
               outDir: "dist-electron/preload",
               rollupOptions: {
                 external: Object.keys(

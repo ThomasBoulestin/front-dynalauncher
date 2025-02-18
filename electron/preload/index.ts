@@ -1,4 +1,5 @@
-const { ipcRenderer, contextBridge, app } = require("electron");
+import { Titlebar, TitlebarColor } from "custom-electron-titlebar";
+const { ipcRenderer, contextBridge, app, ipcMain } = require("electron");
 
 contextBridge.exposeInMainWorld("DYNALAUNCHER", {
   openDialog: async () => {
@@ -132,5 +133,24 @@ domReady().then(appendLoading);
 window.onmessage = (ev) => {
   ev.data.payload === "removeLoading" && removeLoading();
 };
+
+const options = {
+  // options
+  //  1a2226
+  // backgroundColor: TitlebarColor.fromHex("#8584f0"),
+  backgroundColor: TitlebarColor.fromHex("#111214"),
+  iconSize: 20,
+  // titleHorizontalAlignment: "left",
+  // overflow: "auto",
+  removeMenuBar: true,
+  // onlyShowMenubar: false,
+  // menuPosition: "bottom",
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  // Title bar implementation
+
+  var TITLEBAR = new Titlebar(options);
+});
 
 setTimeout(removeLoading, 100);

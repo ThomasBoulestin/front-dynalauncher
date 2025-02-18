@@ -79,11 +79,14 @@ export function JobTable() {
       dispatch({ type: "set_form_data", payload: event.data });
     }
     if (event.event.shiftKey) {
-      if (state.server_home_dir === "") {
+      if (state[0].server_home_dir === "") {
         DYNALAUNCHER.openFile(event.data.input);
       } else {
         DYNALAUNCHER.openFile(
-          event.data.input.replace(state.server_home_dir, state.client_home_dir)
+          event.data.input.replace(
+            state[0].server_home_dir,
+            state[0].client_home_dir
+          )
         );
       }
     }
@@ -93,14 +96,14 @@ export function JobTable() {
         "\\d3plot";
 
       let _command = "";
-      if (state.server_home_dir === "") {
+      if (state[0].server_home_dir === "") {
         _command = '"' + LsPrePost + '" "' + d3path + '"';
       } else {
         _command =
           '"' +
           LsPrePost +
           '" "' +
-          d3path.replace(state.server_home_dir, state.client_home_dir);
+          d3path.replace(state[0].server_home_dir, state[0].client_home_dir);
       }
       addToast("primary", "d3plot", "Opening d3plot ...");
       DYNALAUNCHER.executeCommand(_command)
@@ -120,7 +123,8 @@ export function JobTable() {
   return (
     <div
       className={
-        (night_mode ? "ag-theme-alpine-dark" : "ag-theme-alpine") + " p-2 pt-0"
+        (state[0].night_mode ? "ag-theme-alpine-dark" : "ag-theme-alpine") +
+        " p-2 pt-0"
       }
       style={{ width: "100%", flex: "1 1 auto", overflow: "auto" }}
     >

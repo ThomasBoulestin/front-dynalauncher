@@ -135,7 +135,7 @@ export function PreferencesPage() {
           <div className="d-flex" style={{ width: "50rem" }}>
             <Form.Control
               type="color"
-              value={state.TerminalBgColor}
+              value={state[0].TerminalBgColor}
               onChange={(e) => {
                 dispatch({
                   type: "set_TerminalBgColor",
@@ -149,7 +149,7 @@ export function PreferencesPage() {
               onClick={(e) => {
                 dispatch({
                   type: "set_TerminalBgColor",
-                  value: initialState.TerminalBgColor,
+                  value: initialstate[0].TerminalBgColor,
                 });
               }}
             >
@@ -188,7 +188,7 @@ export function PreferencesPage() {
           <div className="d-flex" style={{ width: "50rem" }}>
             <Form.Control
               type="color"
-              value={state.TerminalTextColor}
+              value={state[0].TerminalTextColor}
               onChange={(e) => {
                 dispatch({
                   type: "set_TerminalTextColor",
@@ -202,7 +202,7 @@ export function PreferencesPage() {
               onClick={(e) => {
                 dispatch({
                   type: "set_TerminalTextColor",
-                  value: initialState.TerminalTextColor,
+                  value: initialstate[0].TerminalTextColor,
                 });
               }}
             >

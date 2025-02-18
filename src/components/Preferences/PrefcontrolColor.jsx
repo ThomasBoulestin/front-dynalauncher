@@ -9,7 +9,7 @@ export function PrefControlColor({ name, action, v, ...props }) {
   ]);
 
   useEffect(() => {
-    setProperties(state[name]);
+    setProperties(state[0][name]);
   }, []);
 
   useEffect(() => {

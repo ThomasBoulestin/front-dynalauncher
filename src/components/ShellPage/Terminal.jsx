@@ -116,7 +116,7 @@ export function Terminal({ job, ...props }) {
 
   useEffect(() => {
     job.stdout = job.stdout;
-  }, [state.TerminalColorRules]);
+  }, [state[0].TerminalColorRules]);
 
   const preRef = useRef();
 
@@ -163,11 +163,11 @@ export function Terminal({ job, ...props }) {
       dispatch({ type: "set_form_data", payload: job });
     }
     if (event.shiftKey) {
-      if (state.server_home_dir === "") {
+      if (state[0].server_home_dir === "") {
         DYNALAUNCHER.openFile(job.input);
       } else {
         DYNALAUNCHER.openFile(
-          job.input.replace(state.server_home_dir, state.client_home_dir)
+          job.input.replace(state[0].server_home_dir, state[0].client_home_dir)
         );
       }
     }
@@ -175,14 +175,14 @@ export function Terminal({ job, ...props }) {
       const d3path =
         job.input.substring(0, job.input.lastIndexOf("\\")) + "\\d3plot";
       let _command = "";
-      if (state.server_home_dir === "") {
+      if (state[0].server_home_dir === "") {
         _command = '"' + LsPrePost + '" "' + d3path + '"';
       } else {
         _command =
           '"' +
           LsPrePost +
           '" "' +
-          d3path.replace(state.server_home_dir, state.client_home_dir);
+          d3path.replace(state[0].server_home_dir, state[0].client_home_dir);
       }
 
       addToast("primary", "d3plot", "Opening d3plot ...");
@@ -200,7 +200,7 @@ export function Terminal({ job, ...props }) {
     }
     // text = text.replace(/<\/?[^>]+(>|$)/g, "");
 
-    state.TerminalColorRules.forEach((element) => {
+    state[0].TerminalColorRules.forEach((element) => {
       try {
         text = text.replaceAll(
           new RegExp("^(?!.*span)" + element.re, "gm"),
@@ -346,8 +346,8 @@ export function Terminal({ job, ...props }) {
             onDoubleClick={scrollToBottom}
             onScroll={(e) => handleScroll(e)}
             style={{
-              color: state.TerminalTextColor,
-              backgroundColor: state.TerminalBgColor,
+              color: state[0].TerminalTextColor,
+              backgroundColor: state[0].TerminalBgColor,
             }}
           >
             {/* {parse(colorText(job.stdout))} */}
