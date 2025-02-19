@@ -30,6 +30,10 @@ contextBridge.exposeInMainWorld("DYNALAUNCHER", {
     const result = await ipcRenderer.invoke("executeCommand", input);
     return result;
   },
+  openRdp: async (input: String) => {
+    const result = await ipcRenderer.invoke("openRdp", input);
+    return result;
+  },
   showNotification: async (title: String, body: String) => {
     const result = await ipcRenderer.invoke("showNotification", title, body);
     return result;

@@ -17,6 +17,7 @@ import {
   setupTitlebar,
   attachTitlebarToWindow,
 } from "custom-electron-titlebar/main";
+import { stdout } from "node:process";
 
 const util = require("node:util");
 const exec = util.promisify(require("node:child_process").exec);
@@ -248,3 +249,42 @@ ipcMain.handle("getUserPref", (event, ...args) => store.get("user_pref"));
 ipcMain.handle("storeUserPref", async (event, ...args) =>
   store.set("user_pref", args[0])
 );
+
+async function openRdp(host: string) {
+  var result = await exec(
+    'tasklist /fo csv /nh /v /fi "IMAGENAME eq mstsc.exe"'
+  );
+
+  var stdout = result.stdout;
+
+  try {
+    const csv = stdout
+      .trim()
+      .split("\r\n")
+      .map((line: string) => line.split(","));
+
+    const filteredCsv = csv.filter((line: string[]) =>
+      line.some((field: string) => field.includes(host))
+    )[0][1];
+
+    try {
+      result = await exec(
+        'powershell.exe -command "(New-Object -ComObject wscript.shell).AppActivate(' +
+          filteredCsv.replaceAll('"', "") +
+          ')"'
+      );
+      return "ok";
+    } catch (error) {
+      return "ok";
+    }
+  } catch (error) {
+    result = await exec("mstsc /v " + host);
+    return "ok";
+  }
+}
+
+ipcMain.handle("openRdp", async (event, ...args) => {
+  const result = await openRdp(args[0]);
+
+  return result;
+});

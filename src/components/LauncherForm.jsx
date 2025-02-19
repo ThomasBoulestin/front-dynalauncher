@@ -11,7 +11,7 @@ import { serverAndClient, socket } from "../socket/Socket";
 import { JobsContext } from "../context/JobsContext/JobsContext";
 import { PreferencesContext } from "../context/PreferencesContext/PreferencesContext";
 import { ToastContext } from "../context/ToastContext/ToastContext";
-import { VscDebugDisconnect } from "react-icons/vsc";
+import { VscDebugDisconnect, VscRemoteExplorer } from "react-icons/vsc";
 
 export function LauncherForm({ ...props }) {
   const { jobs, formData, dispatch } = useContext(JobsContext);
@@ -370,7 +370,7 @@ export function LauncherForm({ ...props }) {
           <Button
             className="px-1"
             variant="danger"
-            style={{ marginLeft: "auto" }}
+            style={{ marginLeft: "auto", width: "8rem" }}
             onClick={() => {
               window.location.reload();
             }}
@@ -436,6 +436,18 @@ export function LauncherForm({ ...props }) {
               })}
             </DropdownButton>
           </InputGroup>
+          <Button
+            className="px-1"
+            variant="info"
+            style={{ marginLeft: "auto", width: "8rem" }}
+            onClick={() => {
+              DYNALAUNCHER.openRdp(state[configID].server_address).then(
+                (resp) => console.log(resp)
+              );
+            }}
+          >
+            <VscRemoteExplorer size="16" className="ps-0" /> Open RDP{"  "}
+          </Button>
         </div>
         <div className="d-flex mb-1">
           <InputGroup className="me-2" style={{ maxWidth: "50%" }}>
