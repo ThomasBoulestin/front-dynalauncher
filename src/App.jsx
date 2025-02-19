@@ -14,6 +14,7 @@ import { PreferencesContext } from "./context/PreferencesContext/PreferencesCont
 
 function App() {
   const { jobs, dispatch, table } = useContext(JobsContext);
+  const { state, configID } = useContext(PreferencesContext);
 
   useEffect(() => {
     serverAndClient
@@ -47,7 +48,14 @@ function App() {
       <LoginModal />
       <div
         className="d-flex flex-column"
-        style={{ height: "calc(100vh - 30px)" }}
+        id="main-frame"
+        style={{
+          height: "calc(100vh - 30px)",
+          borderColor: state[configID].accentColor,
+          borderWidth: "5px",
+          borderStyle: "solid",
+          borderRadius: "10px",
+        }}
       >
         <LauncherForm />
         <PageSelector></PageSelector>

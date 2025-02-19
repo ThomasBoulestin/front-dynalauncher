@@ -1,17 +1,33 @@
 import { useEffect, useState, useContext } from "react";
-import { Modal, Button, Form, InputGroup } from "react-bootstrap";
+import { Modal, Button, Form, InputGroup, Card } from "react-bootstrap";
 import { socket } from "../socket/Socket";
 import { PreferencesContext } from "../context/PreferencesContext/PreferencesContext";
 import { motion } from "framer-motion";
 import { CiSettings } from "react-icons/ci";
 
 export function LoginModal() {
-  const { dispatch, state } = useContext(PreferencesContext);
+  const { dispatch, state, configID, setConfigID } =
+    useContext(PreferencesContext);
 
-  const [newUri, setNewUri] = useState("");
   const [show, setShow] = useState(true);
 
   const [errorMessage, setErrorMessage] = useState(" ");
+
+  const [currID, setCurrID] = useState(0);
+
+  const setTitleBar = (version) => {
+    document.getElementsByClassName("cet-title")[0].innerHTML =
+      "Dyna Launcher " +
+      version +
+      " -- " +
+      state[currID].server_address +
+      ":" +
+      state[currID].server_port;
+  };
+
+  const appendTitleBar = (text) => {
+    document.getElementsByClassName("cet-title")[0].innerHTML += text;
+  };
 
   useEffect(() => {
     socket.on("connect_error", (err) => {
@@ -28,19 +44,9 @@ export function LoginModal() {
     socket.on("connect", (e) => {
       setShow(false);
       setErrorMessage(" ");
-      DYNALAUNCHER.getAppVersion().then(
-        (res) =>
-          (document.getElementsByClassName("cet-title")[0].innerHTML =
-            "Dyna Launcher " +
-            res +
-            " -- " +
-            state[0].server_address +
-            ":" +
-            state[0].server_port)
-      );
 
-      document.getElementsByClassName("cet-titlebar")[0].style.backgroundColor =
-        "#8584f0";
+      //   document.getElementsByClassName("cet-titlebar")[0].style.backgroundColor =
+      //     "#8584f0";
     });
     socket.on("connect_failed", (err) => {
       setErrorMessage("Can not connect to server.");
@@ -60,9 +66,19 @@ export function LoginModal() {
     });
   }, []);
 
-  function handleChangeUri() {
+  function handleChangeUri(id = 0) {
+    setConfigID(id);
+    setCurrID(id);
+
     setErrorMessage("");
-    socket.io.uri = state[0].server_address + ":" + state[0].server_port;
+    socket.io.uri = state[id].server_address + ":" + state[id].server_port;
+
+    document.getElementById("main-frame").style.borderColor =
+      state[id].accent_color;
+
+    appendTitleBar(
+      " --- " + state[id].server_address + ":" + state[id].server_port
+    );
     // socket.disconnect();
     try {
       console.log("connect");
@@ -90,13 +106,6 @@ export function LoginModal() {
     return false;
   }
 
-  useEffect(() => {
-    if (isLocalhost(state[0].server_address)) {
-      dispatch({ type: "set_server_home_dir", value: "" });
-      dispatch({ type: "set_client_home_dir", value: "" });
-    }
-  }, [state[0].server_address]);
-
   return (
     <Modal aria-labelledby="contained-modal-title-vcenter" centered show={show}>
       <Modal.Header>
@@ -112,60 +121,16 @@ export function LoginModal() {
         </Button>
       </Modal.Header>
       <Modal.Body>
-        <InputGroup>
-          <Form.Control
-            type="text"
-            value={state[0].server_address}
-            onChange={(e) =>
-              dispatch({ type: "set_server_address", value: e.target.value })
-            }
-            onKeyDown={handleKeyPress}
-          />
-          <InputGroup.Text>{":"}</InputGroup.Text>
-          <Form.Control
-            type="text"
-            value={state[0].server_port}
-            onChange={(e) =>
-              dispatch({ type: "set_server_port", value: e.target.value })
-            }
-            onKeyDown={handleKeyPress}
-          />
-
-          <Button onClick={handleChangeUri}>Connect</Button>
-        </InputGroup>
-        <div className="d-flex mt-2">
-          <div
-            style={{ width: "10rem", alignSelf: "center", textAlign: "center" }}
-          >
-            Server home dir :
-          </div>
-          <Form.Control
-            disabled={isLocalhost(state[0].server_address)}
-            type="text"
-            value={state[0].server_home_dir}
-            onChange={(e) =>
-              dispatch({ type: "set_server_home_dir", value: e.target.value })
-            }
-            onKeyDown={handleKeyPress}
-          />
-        </div>
-
-        <div className="d-flex mt-2">
-          <div
-            style={{ width: "10rem", alignSelf: "center", textAlign: "center" }}
-          >
-            Client home dir :
-          </div>
-          <Form.Control
-            disabled={isLocalhost(state[0].server_address)}
-            type="text"
-            value={state[0].client_home_dir}
-            onChange={(e) =>
-              dispatch({ type: "set_client_home_dir", value: e.target.value })
-            }
-            onKeyDown={handleKeyPress}
-          />
-        </div>
+        {state.map((e, i) => {
+          return (
+            <MachineDefinition
+              key={i}
+              id={i}
+              handleKeyPress={handleKeyPress}
+              handleChangeUri={handleChangeUri}
+            />
+          );
+        })}
 
         {errorMessage !== "" && (
           <div
@@ -199,5 +164,128 @@ export function LoginModal() {
         )}
       </Modal.Body>
     </Modal>
+  );
+}
+
+function MachineDefinition({ id = 0, handleKeyPress, handleChangeUri }) {
+  const { dispatch, state } = useContext(PreferencesContext);
+
+  //   function handleKeyPress(target) {}
+  //   function handleChangeUri(target) {}
+
+  return (
+    <Card
+      className="mb-2"
+      style={{ borderColor: state[id].accent_color, borderWidth: "3px" }}
+    >
+      <Card.Header>
+        <Form.Control
+          type="text"
+          value={state[id].name}
+          onChange={(e) =>
+            dispatch({ type: "set_name", value: e.target.value, id: id })
+          }
+          onKeyDown={handleKeyPress}
+        />
+
+        <Form.Control
+          type="color"
+          value={state[id].accent_color}
+          onChange={(e) => {
+            dispatch({
+              type: "set_accent_color",
+              value: e.target.value,
+              id: id,
+            });
+          }}
+        />
+      </Card.Header>
+      <Card.Body>
+        <div className="machine-definition">
+          <InputGroup>
+            <Form.Control
+              type="text"
+              value={state[id].server_address}
+              onChange={(e) =>
+                dispatch({
+                  type: "set_server_address",
+                  value: e.target.value,
+                  id: id,
+                })
+              }
+              onKeyDown={handleKeyPress}
+            />
+            <InputGroup.Text>{":"}</InputGroup.Text>
+            <Form.Control
+              type="text"
+              value={state[id].server_port}
+              onChange={(e) =>
+                dispatch({
+                  type: "set_server_port",
+                  value: e.target.value,
+                  id: id,
+                })
+              }
+              onKeyDown={handleKeyPress}
+            />
+
+            <Button
+              onClick={() => {
+                handleChangeUri(id);
+              }}
+            >
+              Connect
+            </Button>
+          </InputGroup>
+          <div className="d-flex mt-2">
+            <div
+              style={{
+                width: "10rem",
+                alignSelf: "center",
+                textAlign: "center",
+              }}
+            >
+              Server home dir :
+            </div>
+            <Form.Control
+              type="text"
+              value={state[id].server_home_dir}
+              onChange={(e) =>
+                dispatch({
+                  type: "set_server_home_dir",
+                  value: e.target.value,
+                  id: id,
+                })
+              }
+              onKeyDown={handleKeyPress}
+            />
+          </div>
+
+          <div className="d-flex mt-2">
+            <div
+              style={{
+                width: "10rem",
+                alignSelf: "center",
+                textAlign: "center",
+              }}
+            >
+              Client home dir :
+            </div>
+            <Form.Control
+              type="text"
+              value={state[id].client_home_dir}
+              onChange={(e) =>
+                dispatch({
+                  type: "set_client_home_dir",
+                  value: e.target.value,
+                  id: id,
+                })
+              }
+              onKeyDown={handleKeyPress}
+            />
+          </div>
+        </div>
+      </Card.Body>
+    </Card>
   );
 }

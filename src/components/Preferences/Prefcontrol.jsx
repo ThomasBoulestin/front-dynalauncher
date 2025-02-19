@@ -3,17 +3,15 @@ import { Button, Form } from "react-bootstrap";
 import { PreferencesContext } from "../../context/PreferencesContext/PreferencesContext";
 
 export function PrefControl({ name, single, action, v, ...props }) {
-  const { dispatch, state } = useContext(PreferencesContext);
+  const { dispatch, state, configID } = useContext(PreferencesContext);
   const [properties, setProperties] = useState([""]);
 
   useEffect(() => {
     if (single) {
-      setProperties([state[0][name]]);
+      setProperties([state[configID][name]]);
     } else {
-      setProperties(state[0][name]);
+      setProperties(state[configID][name]);
     }
-
-    console.log(properties);
   }, []);
 
   useEffect(() => {

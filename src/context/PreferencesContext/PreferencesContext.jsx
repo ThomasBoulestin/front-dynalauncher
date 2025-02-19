@@ -8,6 +8,7 @@ export const PreferencesState = ({ children }) => {
   const initialState = [
     {
       name: "default",
+      accent_color: "#737adb",
       server_address: "",
       server_port: 5568,
       server_home_dir: "",
@@ -34,8 +35,6 @@ export const PreferencesState = ({ children }) => {
       if (resp === undefined) {
         // dispatch({ type: "set_all_prefs", value: initialState });
       } else {
-        console.log(resp);
-
         dispatch({ type: "set_all_prefs", value: resp });
       }
     });
@@ -43,14 +42,13 @@ export const PreferencesState = ({ children }) => {
 
   useEffect(() => {
     let a = state;
-    console.log(a);
     DYNALAUNCHER.storeUserPref(a);
 
-    if (state[0].night_mode !== undefined) {
+    if (state[configID].night_mode !== undefined) {
       const html = document.getElementsByTagName("html");
-      html[0].dataset.bsTheme = state[0].night_mode ? "dark" : "light";
+      html[0].dataset.bsTheme = state[configID].night_mode ? "dark" : "light";
     }
-  }, [state]);
+  }, [state, configID]);
 
   return (
     //Add the functions that have been defined above into the Context provider, and pass on to the children
@@ -58,8 +56,8 @@ export const PreferencesState = ({ children }) => {
       value={{
         state: state,
         initialState: initialState,
-        configID,
-        setConfigID,
+        configID: configID,
+        setConfigID: setConfigID,
         dispatch: dispatch,
         ...state,
       }}

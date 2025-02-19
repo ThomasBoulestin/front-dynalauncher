@@ -21,7 +21,7 @@ import { Button } from "react-bootstrap";
 
 export function QueueTable() {
   const { jobs, dispatch, qtable } = useContext(JobsContext);
-  const { night_mode, state } = useContext(PreferencesContext);
+  const { night_mode, state, configID } = useContext(PreferencesContext);
 
   const gridRef = useRef(); // Optional - for accessing Grid's API
 
@@ -92,8 +92,9 @@ export function QueueTable() {
   return (
     <div
       className={
-        (state[0].night_mode ? "ag-theme-alpine-dark" : "ag-theme-alpine") +
-        " p-2"
+        (state[configID].night_mode
+          ? "ag-theme-alpine-dark"
+          : "ag-theme-alpine") + " p-2"
       }
       style={{ width: "100%", height: 250 }}
     >

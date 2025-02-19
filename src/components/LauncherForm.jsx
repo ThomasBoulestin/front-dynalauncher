@@ -15,7 +15,7 @@ import { VscDebugDisconnect } from "react-icons/vsc";
 
 export function LauncherForm({ ...props }) {
   const { jobs, formData, dispatch } = useContext(JobsContext);
-  const { state } = useContext(PreferencesContext);
+  const { state, configID } = useContext(PreferencesContext);
   const { addToast } = useContext(ToastContext);
 
   const [multiple_input, setMultiple_input] = useState(false);
@@ -295,8 +295,8 @@ export function LauncherForm({ ...props }) {
                       if (!result.canceled) {
                         setInput(
                           result.filePaths[0].replace(
-                            state[0].client_home_dir,
-                            state[0].server_home_dir
+                            state[configID].client_home_dir,
+                            state[configID].server_home_dir
                           )
                         );
                       }
@@ -355,7 +355,7 @@ export function LauncherForm({ ...props }) {
               onInput={(e) => setNcpu(e.target.value)}
             />
             <DropdownButton variant="outline-secondary" title="">
-              {state[0].Ncpu.map((e, i) => {
+              {state[configID].Ncpu.map((e, i) => {
                 return (
                   <Dropdown.Item
                     key={i}
@@ -393,8 +393,8 @@ export function LauncherForm({ ...props }) {
                 DYNALAUNCHER.openDialog().then((result) => {
                   if (!result.canceled) {
                     setSolver(result.filePaths[0]).replace(
-                      state[0].client_home_dir,
-                      state[0].server_home_dir
+                      state[configID].client_home_dir,
+                      state[configID].server_home_dir
                     );
                   }
                 })
@@ -403,7 +403,7 @@ export function LauncherForm({ ...props }) {
               ...
             </Button>
             <DropdownButton variant="outline-secondary" title="">
-              {state[0].Solvers.map((e, i) => {
+              {state[configID].Solvers.map((e, i) => {
                 return (
                   <Dropdown.Item
                     key={i}
@@ -424,7 +424,7 @@ export function LauncherForm({ ...props }) {
               onInput={(e) => setMemory(e.target.value)}
             />
             <DropdownButton variant="outline-secondary" title="">
-              {state[0].Memory.map((e, i) => {
+              {state[configID].Memory.map((e, i) => {
                 return (
                   <Dropdown.Item
                     key={i}
@@ -447,7 +447,7 @@ export function LauncherForm({ ...props }) {
               onInput={(e) => setExpr(e.target.value)}
             />
             <DropdownButton variant="outline-secondary" title="">
-              {state[0].Expressions.map((e, i) => {
+              {state[configID].Expressions.map((e, i) => {
                 return (
                   <Dropdown.Item
                     key={i}

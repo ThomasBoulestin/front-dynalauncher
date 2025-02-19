@@ -5,7 +5,7 @@ import { PrefControl } from "./Prefcontrol";
 import { PrefControlColor } from "./PrefcontrolColor";
 
 export function PreferencesPage() {
-  const { dispatch, night_mode, state, initialState } =
+  const { dispatch, state, configID, initialstate } =
     useContext(PreferencesContext);
 
   useEffect(() => {}, []);
@@ -59,9 +59,13 @@ export function PreferencesPage() {
             <Form.Check
               type="switch"
               id="custom-switch"
-              checked={night_mode}
+              checked={state[configID].night_mode}
               onChange={() =>
-                dispatch({ type: "set_night_mode", value: !night_mode })
+                dispatch({
+                  type: "set_night_mode",
+                  value: !state[configID].night_mode,
+                  id: configID,
+                })
               }
             />
           </div>
@@ -73,7 +77,7 @@ export function PreferencesPage() {
           name={"LsPrePost"}
           single={true}
           action={(value) => {
-            dispatch({ type: "set_LsPrePost", value: value });
+            dispatch({ type: "set_LsPrePost", value: value, id: configID });
           }}
         />
         <span style={{ color: "var(--bs-danger)", alignSelf: "center" }}>
@@ -86,7 +90,7 @@ export function PreferencesPage() {
           name={"Solvers"}
           single={false}
           action={(value) => {
-            dispatch({ type: "set_Solvers", value: value });
+            dispatch({ type: "set_Solvers", value: value, id: configID });
           }}
         />
         <span style={{ color: "var(--bs-danger)", alignSelf: "center" }}>
@@ -98,7 +102,7 @@ export function PreferencesPage() {
         name={"Expressions"}
         single={false}
         action={(value) => {
-          dispatch({ type: "set_Expressions", value: value });
+          dispatch({ type: "set_Expressions", value: value, id: configID });
         }}
       />
 
@@ -106,7 +110,7 @@ export function PreferencesPage() {
         name={"Ncpu"}
         single={false}
         action={(value) => {
-          dispatch({ type: "set_Ncpu", value: value });
+          dispatch({ type: "set_Ncpu", value: value, id: configID });
         }}
       />
 
@@ -114,7 +118,7 @@ export function PreferencesPage() {
         name={"Memory"}
         single={false}
         action={(value) => {
-          dispatch({ type: "set_Memory", value: value });
+          dispatch({ type: "set_Memory", value: value, id: configID });
         }}
       />
 
@@ -135,11 +139,12 @@ export function PreferencesPage() {
           <div className="d-flex" style={{ width: "50rem" }}>
             <Form.Control
               type="color"
-              value={state[0].TerminalBgColor}
+              value={state[configID].TerminalBgColor}
               onChange={(e) => {
                 dispatch({
                   type: "set_TerminalBgColor",
                   value: e.target.value,
+                  id: configID,
                 });
               }}
             />
@@ -149,7 +154,8 @@ export function PreferencesPage() {
               onClick={(e) => {
                 dispatch({
                   type: "set_TerminalBgColor",
-                  value: initialstate[0].TerminalBgColor,
+                  value: "#262626",
+                  id: configID,
                 });
               }}
             >
@@ -188,11 +194,12 @@ export function PreferencesPage() {
           <div className="d-flex" style={{ width: "50rem" }}>
             <Form.Control
               type="color"
-              value={state[0].TerminalTextColor}
+              value={state[configID].TerminalTextColor}
               onChange={(e) => {
                 dispatch({
                   type: "set_TerminalTextColor",
-                  value: e.target.value,
+                  value: "#262626",
+                  id: configID,
                 });
               }}
             />
@@ -203,6 +210,7 @@ export function PreferencesPage() {
                 dispatch({
                   type: "set_TerminalTextColor",
                   value: initialstate[0].TerminalTextColor,
+                  id: configID,
                 });
               }}
             >
@@ -228,7 +236,11 @@ export function PreferencesPage() {
       <PrefControlColor
         name={"TerminalColorRules"}
         action={(value) => {
-          dispatch({ type: "set_TerminalColorRules", value: value });
+          dispatch({
+            type: "set_TerminalColorRules",
+            value: value,
+            id: configID,
+          });
         }}
       />
     </div>

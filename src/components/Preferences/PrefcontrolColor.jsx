@@ -3,13 +3,13 @@ import { Button, Form, InputGroup } from "react-bootstrap";
 import { PreferencesContext } from "../../context/PreferencesContext/PreferencesContext";
 
 export function PrefControlColor({ name, action, v, ...props }) {
-  const { dispatch, state } = useContext(PreferencesContext);
+  const { dispatch, state, configID } = useContext(PreferencesContext);
   const [properties, setProperties] = useState([
     { re: "", style: "color:#000000;" },
   ]);
 
   useEffect(() => {
-    setProperties(state[0][name]);
+    setProperties(state[configID][name]);
   }, []);
 
   useEffect(() => {
