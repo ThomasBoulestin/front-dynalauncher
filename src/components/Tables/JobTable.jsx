@@ -23,8 +23,7 @@ import { ToastContext } from "../../context/ToastContext/ToastContext";
 
 export function JobTable() {
   const { jobs, dispatch, table } = useContext(JobsContext);
-  const { night_mode, LsPrePost, state, configID } =
-    useContext(PreferencesContext);
+  const { night_mode, state, configID } = useContext(PreferencesContext);
   const { addToast } = useContext(ToastContext);
 
   const gridRef = useRef(); // Optional - for accessing Grid's API
@@ -98,11 +97,11 @@ export function JobTable() {
 
       let _command = "";
       if (state[configID].server_home_dir === "") {
-        _command = '"' + LsPrePost + '" "' + d3path + '"';
+        _command = '"' + state[configID].LsPrePost + '" "' + d3path + '"';
       } else {
         _command =
           '"' +
-          LsPrePost +
+          state[configID].LsPrePost +
           '" "' +
           d3path.replace(
             state[configID].server_home_dir,

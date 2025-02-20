@@ -1,6 +1,6 @@
 {
-    "name": "front-dynalaucher-dev",
-    "version": "1.0.8",
+    "name": "front-dynalaucher",
+    "version": "1.0.9",
     "main": "dist-electron/main/index.js",
     "description": "",
     "author": "",

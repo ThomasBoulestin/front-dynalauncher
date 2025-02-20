@@ -21,7 +21,7 @@ import { ToastContext } from "../../context/ToastContext/ToastContext";
 
 export function Terminal({ job, ...props }) {
   const { dispatch } = useContext(JobsContext);
-  const { state, LsPrePost, configID } = useContext(PreferencesContext);
+  const { state, configID } = useContext(PreferencesContext);
   const { addToast } = useContext(ToastContext);
 
   const [scrollLockDown, setScrollLockDown] = useState(true);
@@ -179,11 +179,11 @@ export function Terminal({ job, ...props }) {
         job.input.substring(0, job.input.lastIndexOf("\\")) + "\\d3plot";
       let _command = "";
       if (state[configID].server_home_dir === "") {
-        _command = '"' + LsPrePost + '" "' + d3path + '"';
+        _command = '"' + state[configID].LsPrePost + '" "' + d3path + '"';
       } else {
         _command =
           '"' +
-          LsPrePost +
+          state[configID].LsPrePost +
           '" "' +
           d3path.replace(
             state[configID].server_home_dir,
